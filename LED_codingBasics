@@ -1,0 +1,97 @@
+
+//Initialize led pins as global variables
+int ledOne   = ?; // Pin that's attached to the first LED 
+int ledTwo   = ?; // Pin that's attached to the second LED 
+int ledThree = ?; // Pin that's attached to the third LED 
+const int TO_SECONDS = ?; // Number of milliseconds that equals one second
+
+
+//Put your setup code here, to run once:
+void setup() {
+  pinMode(ledOne, OUTPUT);
+  pinMode(ledTwo, OUTPUT);
+  pinMode(ledThree, OUTPUT);
+}
+
+
+//Put your main code here, to run repeatedly:
+void loop() {
+  //patternZero();
+  //patternOne();
+  //patternTwo();
+  //patternThree();
+  //yourPattern();
+}
+
+void turnAllOn() {
+  digitalWrite(ledOne, HIGH);
+  digitalWrite(ledTwo, HIGH);
+  digitalWrite(ledThree, HIGH);
+}
+
+void turnAllOff() {
+  digitalWrite(ledOne, LOW);
+  digitalWrite(ledTwo, LOW);
+  digitalWrite(ledThree, LOW);
+}
+
+//Function executing pattern zero
+void patternZero() {
+  turnAllOn();
+  delay(1*TO_SECONDS); //Needed to notice the LEDs on;
+  turnAllOff();
+  delay(1*TO_SECONDS); //Needed to notice the LEDs off;
+}
+
+//Function executing pattern One
+void patternOne() {
+  digitalWrite(ledOne, HIGH);
+  delay(1*TO_SECONDS);
+  digitalWrite(ledOne, LOW);
+  digitalWrite(ledTwo, HIGH);
+  delay(1*TO_SECONDS);
+  digitalWrite(ledTwo, LOW);
+  digitalWrite(ledThree, HIGH);
+  delay(1*TO_SECONDS);
+  digitalWrite(ledThree, LOW);
+}
+
+//Function executing pattern Two
+void patternTwo() {
+  digitalWrite(ledOne, HIGH);
+  delay(1*TO_SECONDS);
+  digitalWrite(ledTwo, HIGH);
+  delay(1*TO_SECONDS);
+  digitalWrite(ledThree, HIGH);
+  delay(1*TO_SECONDS);
+  digitalWrite(ledOne, LOW);
+  digitalWrite(ledTwo, LOW);
+  digitalWrite(ledThree, LOW);
+  delay(2*TO_SECONDS);
+}
+
+//Function executing pattern Three
+void patternThree() {
+  turnAllOn();
+  delay(3*TO_SECONDS);
+  turnAllOff();
+  delay(1*TO_SECONDS);
+  turnAllOn();
+  delay(2.5*TO_SECONDS);
+  turnAllOff();
+  delay(1*TO_SECONDS);
+  turnAllOn();
+  delay(2*TO_SECONDS);
+  turnAllOff();
+  delay(1*TO_SECONDS);
+  turnAllOn();
+  delay(1.5*TO_SECONDS);
+  turnAllOff();
+  delay(1*TO_SECONDS);
+  turnAllOn();
+  delay(1*TO_SECONDS);
+  turnAllOff();
+  delay(1*TO_SECONDS);
+}
+
+//Function executing your pattern (fill below)
