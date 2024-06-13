@@ -1,0 +1,27 @@
+// Code to test a water level sensor 
+
+// Sensor pins
+#define sensorPin A0  // define the pin number plugged in for the Signal output
+
+// Variable that will hold water level value, if the sensor is not in water the value is 0
+int val = 0;  // set the integer variable val equal to the value before the sensor gets wet
+
+void setup() {
+	Serial.begin(9600);  // set the baud rate to the integer value 9600
+}
+
+void loop() {
+	// get the reading from the function below and print it
+	int level = readSensor();
+	
+	Serial.print("water level: ");  // print "Water level: "
+	Serial.println(level);  // print the level variable
+	
+	delay(1000);  // 1 seconds but in milliseconds
+}
+
+// Declare a function called readSensor to use in getting water level readings
+int readSensor() {
+	val = analogRead(sensorPin);  // Read the analog value form sensor
+	return val;  // send current reading
+}
