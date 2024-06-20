@@ -1,0 +1,197 @@
+//Used libraries
+#include <Keypad.h>
+#include <LiquidCrystal_I2C.h>
+#include <DHT11.h> // Include library
+
+/* Change these values based on your observations */
+
+// Define variables
+int val = 0;  // set the integer variable val equal to the value before the sensor gets wet
+#define waterWarning 350  // Put the value we consider for the water level to be approaching low
+#define waterDanger 300  // Put the value we consider for the water level to be very low
+
+char stage = '1';  // default plant stage
+int wetSoil = 350; // put the max value we consider for the soil to be 'wet'
+int drySoil = 450; // put the min value we consider for the soil to be 'dry'
+
+// Define analog input
+#define soilMoisturePin A1  // For soil moisture sensor
+#define waterLevelPin A0  // For water level sensor
+
+// Define temp & humidity sensor pin
+#define dhtPin 2 // put the pin number the sensor is connected to
+
+// Define water level output pins
+#define green 11  // Define the pin number the green LED is connected to
+#define yellow 12  // Define the pin number the yellow LED is connected to
+#define red 13  // Define the pin number the red LED is connected to
+
+// Define water pump power pin
+#define waterPumpPower 3  // define the pin number plugged in for the VCC of water pump
+
+//Setup keypad
+const byte ROWS = 4;
+const byte COLS = 3;
+byte R1 = A2; // Row one (Top most row containing: 1 2 3)
+//byte R2 = 10; // Row two 
+//byte R3 = 9; // Row three
+//byte R4 = 8; // Row four (Bottom most row containing: * 0 #)
+byte C1 = 10;  // Column one (Left most column: 1 4 7 *)
+byte C2 = 9;  // Column two
+byte C3 = 8; // Column three (Right most column: 3 6 9 #)
+char hexaKeys[ROWS][COLS] = {
+  {'1', '2', '3'},
+  {'4', '5', '6'},
+  {'7', '8', '9'},
+  {'*', '0', '#'}};
+byte rowPins[ROWS] = {R1, NULL, NULL, NULL};
+byte colPins[COLS] = {C1, C2, C3};
+Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+
+// Setup dht
+DHT11 DHT(dhtPin); // Creates a DHT object
+
+// Setup LCD
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+unsigned long previousMillis = 0;
+unsigned long twoSeconds = 2000;
+
+void setup() {
+  // Set pins for water level as inputs/outputs
+  pinMode(green, OUTPUT);  // set the pin mode to OUTPUT
+  pinMode(yellow, OUTPUT);  // set the pin mode to OUTPUT
+  pinMode(red, OUTPUT);  // set the pin mode to OUTPUT
+
+  // Set pin mode for water pump
+	pinMode(waterPumpPower, OUTPUT);  // Set the pin mode to INPUT
+
+	// Set to LOW so no power flows through the sensors
+  digitalWrite(waterPumpPower, LOW); // set the pin mode to LOW
+
+  // Initialize LCD
+  lcd.init();
+  lcd.clear();
+  lcd.backlight();      // Make sure backlight is on
+
+  Serial.begin(9600); // put the baud rate we need to use
+}
+
+void loop() {
+  getStage();
+
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis > twoSeconds) {
+    previousMillis = currentMillis;
+    waterLevel();
+    tempHumidity();
+    bool pumpWater = soilMoisture();  // returns whether the plant needs more water
+    waterPump(pumpWater);  // Controls the water pump
+  }
+
+}
+
+// Declare a function called waterLevel to use in getting water level readings
+void waterLevel() {
+	float level = analogRead(waterLevelPin);		// Read the analog value from sensor
+
+  Serial.print("Water level: "); // print "Water level: "
+	Serial.println(level); // print the level variable
+
+  // Controls the LEDs corresponding to each water level
+  if (level <= waterDanger) {
+    digitalWrite(red, HIGH);  // Turn the red LED on
+    digitalWrite(yellow, LOW);  // Turn the yellow LED off
+    digitalWrite(green, LOW);  // Turn the yellow LED off
+  } else if (level <= waterWarning) {
+    digitalWrite(red, LOW);  // Turn the yellow LED off
+    digitalWrite(yellow, HIGH);  // Turn the yellow LED on
+    digitalWrite(green, LOW);  // Turn the yellow LED off
+  } else {
+    digitalWrite(red,LOW);  // Turn the yellow LED off
+    digitalWrite(yellow, LOW);  // Turn the yellow LED off
+    digitalWrite(green, HIGH);  // Turn the green LED on
+  }
+}
+
+void getStage() {
+  //Save a single pressed key value
+  stage = customKeypad.getKey();
+  
+  //Create a conditional to make sure the digit is '1', '2', or '3'
+  //if(condition1 | condition2 | condition3) {}
+  if(stage == '1') {  // Hasn't sprouted
+    wetSoil = 375; // put the max value we consider for the soil to be 'wet'
+    drySoil = 475; // put the min value we consider for the soil to be 'dry'
+    Serial.print(stage);
+  } else if (stage == '2') {  // Sprouted
+    wetSoil = 350; // put the max value we consider for the soil to be 'wet'
+    drySoil = 450; // put the min value we consider for the soil to be 'dry'
+    Serial.print(stage);
+  } else if (stage == '3') {  // Close to harvest
+    wetSoil = 300; // put the max value we consider for the soil to be 'wet'
+    drySoil = 400; // put the min value we consider for the soil to be 'dry'
+    Serial.print(stage);
+  }
+}
+
+// Declare a function called ____
+void tempHumidity() {
+  int temperature = 0;
+  int humidity = 0;
+
+  int result = DHT.readTemperatureHumidity(temperature, humidity);
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
+  if (result == 0) {
+    lcd.print("Temp: ");
+
+    lcd.print((temperature*9.0)/5.0+32.0); // Convert celsius to fahrenheit
+
+    lcd.print((char)223);  // Degrees chaaracter
+
+    lcd.print("F");
+
+    lcd.setCursor(0, 1);  // Next line
+
+    lcd.print("Humidity: ");
+
+    lcd.print(humidity);
+
+    lcd.print("%");
+  } else {
+    // Print error message based on the error code.
+    lcd.print(DHT11::getErrorString(result));
+  }
+}
+
+bool soilMoisture() {
+    // Read the Analog Input and print it
+  int moisture = analogRead(soilMoisturePin);
+  Serial.print("Soil Moisture: ");
+  Serial.println(moisture);
+
+  bool waterPlants = false;
+
+  // Determine status of our soil
+  if (moisture <= wetSoil) { // put the name of the variable for wet soil
+    Serial.println("Status: Soil is too wet");
+  } else if (moisture < drySoil) { // put the name of the variable for dry soil
+    Serial.println("Status: Soil moisture is perfect");
+  } else {
+    Serial.println("Status: Soil is too dry - time to water!");
+    waterPlants = true;
+  }
+  Serial.println();
+  
+  return waterPlants;
+}
+
+void waterPump(bool pumpWater) {
+  if (pumpWater) {
+    digitalWrite(waterPumpPower, HIGH);  // Turn on water pump
+  } else {
+    digitalWrite(waterPumpPower, LOW);  // Turn off water pump
+  }
+}
