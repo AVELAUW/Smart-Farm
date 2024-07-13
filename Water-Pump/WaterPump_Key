@@ -1,0 +1,12 @@
+// Code to activate a 5V water pump for 2 seconds and turn it off for 2 seconds in a loop
+
+void setup() {
+Serial.begin(9600); // put the baud rate we need to use
+}
+
+void loop() {
+  digitalWrite(waterPumpPower, HIGH);  // Turn on water pump
+  delay(2000);  // Delay for 2 seconds
+  digitalWrite(waterPumpPower, LOW);  // Turn off water pump
+  delay(2000);  // Delay for 2 seconds
+}
