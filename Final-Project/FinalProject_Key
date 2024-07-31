@@ -7,19 +7,19 @@
 
 // Define variables
 int val = 0;  // set the integer variable val equal to the value before the sensor gets wet
-#define waterWarning 275  // Put the value we consider for the water level to be approaching low
-#define waterDanger 250  // Put the value we consider for the water level to be very low
+#define waterWarning 275  // Put the value we consider for the water level to be approaching low (275)
+#define waterDanger 250  // Put the value we consider for the water level to be very low (250)
 
-char stage = '1';  // default plant stage
-int wetSoil = 375; // put the max value we consider for the soil to be 'wet' in stage 1
-int drySoil = 475; // put the min value we consider for the soil to be 'dry' in stage 1
+char stage = '1';  // Default plant stage
+int wetSoil = 375; // Put the max value we consider for the soil to be 'wet' in stage 1 (375)
+int drySoil = 475; // Put the min value we consider for the soil to be 'dry' in stage 1 (475)
 
-// Define analog input
-#define soilMoisturePin A1  // For soil moisture sensor
-#define waterLevelPin A0  // For water level sensor
+// Define analog input pins
+#define soilMoisturePin A1  // Analog pin the soil moisture sensor is connected to
+#define waterLevelPin A0  // Analog pin the water level sensor is connected to
 
 // Define temp & humidity sensor pin
-#define dhtPin 6  // put the pin number the sensor is connected to
+#define dhtPin 6  // Put the pin number the sensor is connected to
 #define DHTTYPE DHT22  // The type of sensor is a DHT22
 
 // Define water level output pins
@@ -28,22 +28,22 @@ int drySoil = 475; // put the min value we consider for the soil to be 'dry' in 
 #define red 13  // Define the pin number the red LED is connected to
 
 // Define water pump power pin
-#define waterPumpPower 3  // define the pin number plugged in for the VCC of water pump
+#define waterPumpPower 3  // Define the pin number plugged in for the VCC of water pump
 
 // Setup keypad
 const byte ROWS = 4;
 const byte COLS = 3;
-byte R1 = A2; // Row one (Top most row containing: 1 2 3)
+byte R1 = A2;  // Pin connected to row one (Top most row containing: 1 2 3)
 
 /* These rows aren't included in this code because we only need the numbers 1-3
-byte R2 = 10; // Row two 
-byte R3 = 9; // Row three
-byte R4 = 8; // Row four (Bottom most row containing: * 0 #)
+byte R2 = __;  // Pin connected to row two 
+byte R3 = __;  // Pin connected to row three
+byte R4 = __;  // Pin connected to row four (Bottom most row containing: * 0 #)
 */
 
-byte C1 = 10;  // Column one (Left most column: 1 4 7 *)
-byte C2 = 9;  // Column two (Middle column: 2 5 8 0)
-byte C3 = 8; // Column three (Right most column: 3 6 9 #)
+byte C1 = 10;  // Pin connected to column one (Left most column: 1 4 7 *)
+byte C2 = 9;  // Pin connected to column two (Middle column: 2 5 8 0)
+byte C3 = 8;  // Pin connected to column three (Right most column: 3 6 9 #)
 char hexaKeys[ROWS][COLS] = {
   {'1', '2', '3'},
   {'4', '5', '6'},
@@ -56,7 +56,7 @@ Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS)
 // Setup dht
 DHT dht(dhtPin, DHTTYPE);  // Creates a DHT object
 
-// Setup LCD
+// Setup LCD that is 2 lines of 16 characters big
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Variables used to track whether 2 seconds has passed. Will be used as a timer
@@ -78,7 +78,7 @@ void setup() {
   // Initialize LCD
   lcd.init();
   lcd.clear();
-  lcd.backlight();  // Make sure backlight is on
+  lcd.backlight();  // Makes sure backlight is on
 
   Serial.begin(9600);  // Put the baud rate we need to use
 
@@ -99,8 +99,8 @@ void loop() {
     // Water pump only pumps for 2 seconds before turning off for another 2
     // Once off for 2 seconds, the soil moisture will be checked again
     if (check) {
-      bool pumpWater = soilMoisture();  // returns whether the plant needs more water
-      waterPump(pumpWater);  // Controls the water pump
+      bool pumpWater = soilMoisture();  // Returns whether the plant needs more water
+      waterPump(pumpWater);  // Run the waterPump function
     }
     check = !check;  // Set check equal to its current opposite value (use ! to mean 'not')
   }
@@ -110,8 +110,8 @@ void loop() {
 void waterLevel() {
 	float level = analogRead(waterLevelPin);  // Read the analog value from waterLevelPin
 
-  Serial.print("Water level: "); // Print "Water level: "
-	Serial.println(level); // Print the level variable
+  Serial.print("Water level: ");  // Print "Water level: "
+	Serial.println(level);  // Print the level variable
 
   // Controls the LEDs corresponding to each water level
   if (level <= waterDanger) {
@@ -123,37 +123,38 @@ void waterLevel() {
     digitalWrite(yellow, HIGH);  // Turn the yellow LED on
     digitalWrite(green, LOW);  // Turn the yellow LED off
   } else {
-    digitalWrite(red,LOW);  // Turn the yellow LED off
+    digitalWrite(red, LOW);  // Turn the yellow LED off
     digitalWrite(yellow, LOW);  // Turn the yellow LED off
     digitalWrite(green, HIGH);  // Turn the green LED on
   }
 }
 
-// Declare a function called getStage
+// Declare a function called getStage to determine desired soil moisture levels
 void getStage() {
   // Save stage as the button pressed on the keypad
   stage = customKeypad.getKey();
   
+  /* Change these values based on your observations */
   // Create conditionals for if the digit is '1', '2', or '3'
   if(stage == '1') {  // Hasn't sprouted
-    wetSoil = 375; //  Put the max value we consider for the soil to be 'wet' in this stage
-    drySoil = 475; //  Put the min value we consider for the soil to be 'dry' in this stage
+    wetSoil = 375; //  Put the max value we consider for the soil to be 'wet' in this stage (375)
+    drySoil = 475; //  Put the min value we consider for the soil to be 'dry' in this stage (475)
     Serial.println(stage);
   } else if (stage == '2') {  // Sprouted
-    wetSoil = 350; //  Put the max value we consider for the soil to be 'wet' in this stage
-    drySoil = 450; //  Put the min value we consider for the soil to be 'dry' in this stage
+    wetSoil = 350; //  Put the max value we consider for the soil to be 'wet' in this stage (350)
+    drySoil = 450; //  Put the min value we consider for the soil to be 'dry' in this stage (450)
     Serial.println(stage);
   } else if (stage == '3') {  // Close to harvest
-    wetSoil = 300; //  Put the max value we consider for the soil to be 'wet' in this stage
-    drySoil = 400; //  Put the min value we consider for the soil to be 'dry' in this stage
+    wetSoil = 300; //  Put the max value we consider for the soil to be 'wet' in this stage (300)
+    drySoil = 400; //  Put the min value we consider for the soil to be 'dry' in this stage (400)
     Serial.println(stage);
   }
 }
 
-// Declare a function called tempHumidity
+// Declare a function called tempHumidity to check/print temp & humidity
 void tempHumidity() {
   float h = dht.readHumidity();  // Reads the humidity as h
-  float f = dht.readTemperature(true);  // Read temperature as Fahrenheit (isFahrenheit = true)
+  float f = dht.readTemperature(true);  // Read temperature in Fahrenheit as f (isFahrenheit = true)
 
   lcd.setCursor(0, 0);  // Set the cursor to start in the top left (0,0)
 
@@ -171,7 +172,7 @@ void tempHumidity() {
   lcd.print(f);
   Serial.print(f);
 
-  // Print "°F"
+  // Prints "°F"
   lcd.print((char)223);  // Degrees character
   lcd.print("F");
   Serial.println("°F");
@@ -202,7 +203,7 @@ bool soilMoisture() {
   bool waterPlants = false;  // Set the default value to false
 
   // Determine status of our soil
-  if (moisture <= wetSoil) {  // put the name of the variable for wet soil
+  if (moisture <= wetSoil) {  // Put the name of the variable for wet soil
     Serial.println("Status: Soil is too wet");
   } else if (moisture < drySoil) {  // put the name of the variable for dry soil
     Serial.println("Status: Soil moisture is perfect");
