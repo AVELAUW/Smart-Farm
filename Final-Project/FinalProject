@@ -6,20 +6,20 @@
 /* Change these values based on your observations */
 
 // Define variables
-int val = ?;  // set the integer variable val equal to the value before the sensor gets wet
+int val = ?;  // Set the integer variable val equal to the value before the sensor gets wet
 #define waterWarning ?  // Put the value we consider for the water level to be approaching low (275)
 #define waterDanger ?  // Put the value we consider for the water level to be very low (250)
 
 char stage = '?';  // Set '1' as the default plant stage
-int wetSoil = ?; // put the max value we consider for the soil to be 'wet' in stage 1 (375)
-int drySoil = ?; // put the min value we consider for the soil to be 'dry' in stage 1 (475)
+int wetSoil = ?; // Put the max value we consider for the soil to be 'wet' in stage 1 (375)
+int drySoil = ?; // Put the min value we consider for the soil to be 'dry' in stage 1 (475)
 
 // Define analog input
-#define soilMoisturePin ?  // For soil moisture sensor
-#define waterLevelPin ?  // For water level sensor
+#define soilMoisturePin ?  // Analog pin the soil moisture sensor is connected to
+#define waterLevelPin ?  // Analog pin the water level sensor is connected to
 
 // Define temp & humidity sensor pin
-#define dhtPin ?  // put the pin number the sensor is connected to
+#define dhtPin ?  // Put the pin number the sensor is connected to
 #define DHTTYPE DHT22  // The type of sensor is a DHT22
 
 // Define water level output pins
@@ -28,17 +28,17 @@ int drySoil = ?; // put the min value we consider for the soil to be 'dry' in st
 #define red ?  // Define the pin number the red LED is connected to
 
 // Define water pump power pin
-#define waterPumpPower ?  // define the pin number plugged in for the VCC of water pump
+#define waterPumpPower ?  // Define the pin number plugged in for the VCC of water pump
 
 // Setup keypad
 const byte ROWS = 4;
 const byte COLS = 3;
-byte R1 = ?; // Pin connected to row one (Top most row containing: 1 2 3)
+byte R1 = ?;  // Pin connected to row one (Top most row containing: 1 2 3)
 
 /* These rows aren't included in this code because we only need the numbers 1-3
-byte R2 = __; // Pin connected to row two 
-byte R3 = __; // Pin connected to row three
-byte R4 = __; // Pin connected to row four (Bottom most row containing: * 0 #)
+byte R2 = __;  // Pin connected to row two 
+byte R3 = __;  // Pin connected to row three
+byte R4 = __;  // Pin connected to row four (Bottom most row containing: * 0 #)
 */
 
 byte C1 = ?;  // Pin connected to column one (Left most column: 1 4 7 *)
@@ -99,7 +99,7 @@ void loop() {
     // Water pump only pumps for 2 seconds before turning off for another 2
     // Once off for 2 seconds, the soil moisture will be checked again
     if (check) {
-      bool pumpWater = soilMoisture();  // returns whether the plant needs more water
+      bool pumpWater = soilMoisture();  // Returns whether the plant needs more water
       ?(?);  // Run the waterPump function
     }
     check = ?;  // Set check equal to its current opposite value (use ! to mean 'not')
@@ -205,7 +205,7 @@ void ?() {
   // Determine status of our soil
   if (moisture <= ?) {  // put the name of the variable for wet soil
     Serial.println("Status: Soil is too wet");
-  } else if (moisture < ?) {  // put the name of the variable for dry soil
+  } else if (moisture < ?) {  // Put the name of the variable for dry soil
     Serial.println("Status: Soil moisture is perfect");
   } else {
     Serial.println("Status: Soil is too dry - time to water!");
